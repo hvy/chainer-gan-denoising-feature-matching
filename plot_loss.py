@@ -10,7 +10,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--log', type=str, default='result/log')
     parser.add_argument('--out', type=str, default='result/log.png')
-    parser.add_argument('--keys', nargs='+', type=str, default=['dis/loss', 'gen/loss', 'den/loss'])
+    parser.add_argument('--keys', nargs='+', type=str, default=['dis/loss', 'gen/loss', 'denoiser/loss'])
     return parser.parse_args()
 
 

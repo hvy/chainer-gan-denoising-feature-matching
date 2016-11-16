@@ -98,8 +98,9 @@ class GenerativeAdversarialUpdater(training.StandardUpdater):
 
     def update_discriminator(self, z, x_real, test):
         x_fake = self.generator(Variable(z), test=test)
-        y_fake = self.discriminator(x_fake, test=test)
-        y_real = self.discriminator(Variable(x_real))
+        y_fake = self.discriminator(x_fake, generated=True, test=test)
+        y_real = self.discriminator(Variable(x_real), generated=False,
+                                    test=test)
 
         loss = F.softmax_cross_entropy(y_fake,
             Variable(self.xp.zeros(y_fake.shape[0], dtype=self.xp.int32)))
@@ -111,9 +112,9 @@ class GenerativeAdversarialUpdater(training.StandardUpdater):
 
     def update_generator(self, z, test):
         x_fake = self.generator(Variable(z), test=test)
-        y_fake = self.discriminator(x_fake, test=test)
-        features = self.feature_extractor(x_fake)
-        denoised = self.denoiser(features)
+        y_fake = self.discriminator(x_fake, generated=True, test=test)
+        features = self.feature_extractor(x_fake, generated=True, test=test)
+        denoised = self.denoiser(features, generated=True, test=test)
 
         loss = self.lambda_denoise * F.mean_squared_error(features, denoised)
         loss += self.lambda_adv * F.softmax_cross_entropy(y_fake,
@@ -122,8 +123,9 @@ class GenerativeAdversarialUpdater(training.StandardUpdater):
         return loss
 
     def update_denoiser(self, x_real, test):
-        corrupted_features = self.feature_extractor(x_real, test=test, corrupt=True)
-        denoised = self.denoiser(corrupted_features)
+        corrupted_features = self.feature_extractor(x_real, generated=False,
+                                                    test=test, corrupt=True)
+        denoised = self.denoiser(corrupted_features, generated=False, test=test)
 
         loss = F.mean_squared_error(corrupted_features, denoised)
 

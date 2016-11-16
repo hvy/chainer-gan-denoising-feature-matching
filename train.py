@@ -41,7 +41,7 @@ if __name__ == '__main__':
     optimizer_denoiser = optimizers.Adam(alpha=1e-3, beta1=0.5)
 
     optimizer_generator.setup(Generator())
-    optimizer_discriminator.setup(Discriminator()))
+    optimizer_discriminator.setup(Discriminator())
     optimizer_denoiser.setup(Denoiser())
 
     updater = updater.GenerativeAdversarialUpdater(
