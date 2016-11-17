@@ -33,9 +33,10 @@ class Discriminator(Chain):
             feature_extractor=FeatureExtractor(),
             classifier=Classifier())
 
-    def __call__(self, x, generated=False, test=False, features=False):
-        f = self.feature_extractor(x, generated=generated, test=test)
+    def __call__(self, x, test=False, features=False):
+        f = self.feature_extractor(x, test=test)
         h = self.classifier(f)
+
         if features:
             return h, f
         return h
@@ -50,25 +51,13 @@ class FeatureExtractor(Chain):
             c2=L.Convolution2D(32, 64, 4, stride=2, pad=1),
             c3=L.Convolution2D(64, 128, 4, stride=2, pad=1),
             c4=L.Convolution2D(128, 256, 4, stride=2, pad=1),
-            fc=L.Linear(None, 2048))
+            fc=L.Linear(None, 512),
+            bn_c2=L.BatchNormalization(64),
+            bn_c3=L.BatchNormalization(128),
+            bn_c4=L.BatchNormalization(256))
 
-        for name in ['c2', 'c3', 'c4']:
-            link = getattr(self, name)
-            size = getattr(link, 'out_channels')
-            self.add_link('bn_{}'.format(name), L.BatchNormalization(size))
-            """
-            self.add_link('bn_{}_real'.format(name), L.BatchNormalization(size))
-            self.add_link('bn_{}_fake'.format(name), L.BatchNormalization(size))
-            """
-
-    def __call__(self, x, generated=False, test=False):
-        postfix = 'fake' if generated else 'real'
+    def __call__(self, x, test=False):
         h = F.leaky_relu(self.c1(x))
-        """
-        h = F.leaky_relu(getattr(self, 'bn_c2_{}'.format(postfix))(self.c2(h), test=test))
-        h = F.leaky_relu(getattr(self, 'bn_c3_{}'.format(postfix))(self.c3(h), test=test))
-        h = F.leaky_relu(getattr(self, 'bn_c4_{}'.format(postfix))(self.c4(h), test=test))
-        """
         h = F.leaky_relu(self.bn_c2(self.c2(h), test=test))
         h = F.leaky_relu(self.bn_c3(self.c3(h), test=test))
         h = F.leaky_relu(self.bn_c4(self.c4(h), test=test))
@@ -86,26 +75,21 @@ class Classifier(Chain):
 
 
 class Denoiser(Chain):
-    def __init__(self, n_layers=10):
-        super().__init__()
-        self.n_layers = n_layers
+    def __init__(self):
+        super().__init__(
+            l1=L.Linear(512, 512),
+            l2=L.Linear(512, 512),
+            l3=L.Linear(512, 512),
+            l4=L.Linear(512, 512),
+            l5=L.Linear(512, 512),
+            bn_l2=L.BatchNormalization(512),
+            bn_l3=L.BatchNormalization(512),
+            bn_l4=L.BatchNormalization(512))
 
-        for i in range(self.n_layers):
-            self.add_link('l{}'.format(i), L.Linear(None, 2048))
-
-        # Two sets of batch normalization layers for all linear layers except
-        # the last one
-        for i in range(self.n_layers - 1):
-            self.add_link('bn_l{}_real'.format(i), L.BatchNormalization(2048))
-            self.add_link('bn_l{}_fake'.format(i), L.BatchNormalization(2048))
-
-    def __call__(self, x, generated=False, test=False):
-        postfix = 'fake' if generated else 'real'
-        h = x
-        for i in range(self.n_layers - 1):
-            h = getattr(self, 'l{}'.format(i))(h)
-            h = getattr(self, 'bn_l{}_{}'.format(i, postfix))(h, test=test)
-            h = F.relu(h)
-        h = getattr(self, 'l{}'.format(self.n_layers - 1))(h)
-
+    def __call__(self, x, test=False):
+        h = F.relu(self.l1(x))
+        h = F.relu(self.bn_l2(self.l2(h), test=test))
+        h = F.relu(self.bn_l3(self.l3(h), test=test))
+        h = F.relu(self.bn_l4(self.l4(h), test=test))
+        h = self.l5(h)
         return h

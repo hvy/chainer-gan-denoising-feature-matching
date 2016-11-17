@@ -14,7 +14,7 @@ extensions.GeneratorSample = GeneratorSample
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--gpu', type=int, default=-1)
+    parser.add_argument('--gpu', type=int, default=1)
     parser.add_argument('--nz', type=int, default=100)
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--batch-size', type=int, default=128)
