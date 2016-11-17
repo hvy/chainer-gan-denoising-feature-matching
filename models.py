@@ -34,9 +34,11 @@ class Discriminator(Chain):
             feature_extractor=FeatureExtractor(),
             classifier=Classifier())
 
-    def __call__(self, x, generated=False, test=False):
-        h = self.feature_extractor(x, generated=generated, test=test)
-        h = self.classifier(h)
+    def __call__(self, x, generated=False, test=False, features=False):
+        f = self.feature_extractor(x, generated=generated, test=test)
+        h = self.classifier(f)
+        if features:
+            return h, f
         return h
 
 
@@ -54,38 +56,37 @@ class FeatureExtractor(Chain):
         for name in ['c2', 'c3', 'c4']:
             link = getattr(self, name)
             size = getattr(link, 'out_channels')
+            self.add_link('bn_{}'.format(name), L.BatchNormalization(size))
+            """
             self.add_link('bn_{}_real'.format(name), L.BatchNormalization(size))
             self.add_link('bn_{}_fake'.format(name), L.BatchNormalization(size))
+            """
 
-    def __call__(self, x, generated=False, test=False, corrupt=False):
+    def __call__(self, x, generated=False, test=False):
         postfix = 'fake' if generated else 'real'
         h = F.leaky_relu(self.c1(x))
+        """
         h = F.leaky_relu(getattr(self, 'bn_c2_{}'.format(postfix))(self.c2(h), test=test))
         h = F.leaky_relu(getattr(self, 'bn_c3_{}'.format(postfix))(self.c3(h), test=test))
         h = F.leaky_relu(getattr(self, 'bn_c4_{}'.format(postfix))(self.c4(h), test=test))
-        h = F.leaky_relu(self.fc(h))
-
-        if corrupt:
-            # Add Gaussian noise. This code should run during the denoiser
-            # training forward pass
-            # TODO: Anneal the std towards 0 according to paper
-            mean = self.xp.zeros_like(h.data, dtype=self.xp.float32)
-            ln_var = self.xp.zeros_like(h.data, dtype=self.xp.float32)
-            h += F.gaussian(mean=Variable(mean), ln_var=Variable(ln_var))
-
+        """
+        h = F.leaky_relu(self.bn_c2(self.c2(h), test=test))
+        h = F.leaky_relu(self.bn_c3(self.c3(h), test=test))
+        h = F.leaky_relu(self.bn_c4(self.c4(h), test=test))
+        h = self.fc(h)
         return h
-
 
 class Classifier(Chain):
     def __init__(self):
         super().__init__(fc=L.Linear(None, 2))
 
-    def __call__(self, x, corrupt=False):
-        h = F.sigmoid(self.fc(x))
+    def __call__(self, x):
+        h = self.fc(x)
         return h
 
 
 class Denoiser(Chain):
+
     def __init__(self, n_layers=10):
         super().__init__()
         self.n_layers = n_layers
@@ -101,9 +102,11 @@ class Denoiser(Chain):
 
     def __call__(self, x, generated=False, test=False):
         postfix = 'fake' if generated else 'real'
-        for i in range(self.n_layers):
-            x = getattr(self, 'l{}'.format(i))(x)
-            if i < self.n_layers - 1:
-                x = getattr(self, 'bn_l{}_{}'.format(i, postfix))(x, test)
-            x = F.relu(x)
-        return x
+        h = x
+        for i in range(self.n_layers - 1):
+            h = getattr(self, 'l{}'.format(i))(h)
+            h = getattr(self, 'bn_l{}_{}'.format(i, postfix))(h, test=test)
+            h = F.relu(h)
+        h = getattr(self, 'l{}'.format(self.n_layers - 1))(h)
+
+        return h

@@ -18,8 +18,8 @@ def parse_args():
     parser.add_argument('--nz', type=int, default=100)
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--batch-size', type=int, default=128)
-    parser.add_argument('--lambda-denoise', type=float, default=0.5)
-    parser.add_argument('--lambda-adv', type=float, default=0.5)
+    parser.add_argument('--lambda-denoise', type=float, default=1.0)
+    parser.add_argument('--lambda-adv', type=float, default=1.0)
     return parser.parse_args()
 
 
