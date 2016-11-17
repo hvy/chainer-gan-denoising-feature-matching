@@ -1,4 +1,3 @@
-import chainer
 from chainer import Chain, Variable
 from chainer import functions as F
 from chainer import links as L
@@ -76,6 +75,7 @@ class FeatureExtractor(Chain):
         h = self.fc(h)
         return h
 
+
 class Classifier(Chain):
     def __init__(self):
         super().__init__(fc=L.Linear(None, 2))
@@ -86,7 +86,6 @@ class Classifier(Chain):
 
 
 class Denoiser(Chain):
-
     def __init__(self, n_layers=10):
         super().__init__()
         self.n_layers = n_layers

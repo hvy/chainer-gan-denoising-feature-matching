@@ -1,10 +1,10 @@
 import argparse
 from chainer import datasets, training, iterators, optimizers, optimizer
 from chainer.training import updater, extensions
-from iterators import RandomNoiseIterator, UniformNoiseGenerator
-from models import Generator, Discriminator, Denoiser
-from updater import GenerativeAdversarialUpdater
-from extensions import GeneratorSample
+from lib.chainer.iterators import RandomNoiseIterator, UniformNoiseGenerator
+from lib.chainer.updater import GenerativeAdversarialUpdater
+from lib.chainer.extensions import GeneratorSample
+from lib.models import Generator, Discriminator, Denoiser
 
 
 iterators.RandomNoiseIterator = RandomNoiseIterator
@@ -18,8 +18,8 @@ def parse_args():
     parser.add_argument('--nz', type=int, default=100)
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--batch-size', type=int, default=128)
-    parser.add_argument('--lambda-denoise', type=float, default=1.0)
-    parser.add_argument('--lambda-adv', type=float, default=1.0)
+    parser.add_argument('--lambda-denoise', type=float, default=0.5)
+    parser.add_argument('--lambda-adv', type=float, default=0.5)
     return parser.parse_args()
 
 

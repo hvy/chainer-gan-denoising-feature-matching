@@ -1,5 +1,7 @@
-import matplotlib
-matplotlib.use('Agg')
+import sys
+if 'matplotlib' not in sys.modules:
+    import matplotlib
+    matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 import math
 

@@ -55,39 +55,20 @@ class GenerativeAdversarialUpdater(training.StandardUpdater):
     def feature_extractor(self):
         return self._optimizers['dis'].target.feature_extractor
 
-    def forward(self, test=False, report=True):
-        z_it = self._iterators['z'].next()
-        z = self.converter(z_it, self.device)
+    def update_core(self):
+        # Update all networks once each, you may update any network more than
+        # once to balance the training in this iteration
+        z = self.converter(self._iterators['z'].next(), self.device)
+        x_real = self.converter(self._iterators['main'].next(), self.device)
 
-        x_fake = self.generator(Variable(z), test=test)
-        y_fake = self.discriminator(x_fake, generated=True, test=test)
+        loss_discriminator = self.update_discriminator(z, x_real)
+        loss_generator = self.update_generator(z)
+        loss_denoiser = self.update_denoiser(x_real)
 
-        x_real_it = self._iterators['main'].next()
-        x_real = self.converter(x_real_it, self.device)
-
-        y_real = self.discriminator(Variable(x_real), generated=False)
-
-
-        if test:
-            return x_fake
-        else:
-            return y_fake, y_real
-
-    def update_params(self, losses, report=True):
-        for name, loss in losses.items():
-            if report:
-                reporter.report({'{}/loss'.format(name): loss})
-
-            self._optimizers[name].target.cleargrads()
-            loss.backward()
-            self._optimizers[name].update()
-
-    def __update_core(self):
-        if self.is_new_epoch:
-            pass
-
-        losses = self.backward(self.forward())
-        self.update_params(losses, report=True)
+        if self.report:
+            reporter.report({'dis/loss': loss_discriminator})
+            reporter.report({'gen/loss': loss_generator})
+            reporter.report({'denoiser/loss': loss_denoiser})
 
     def update_discriminator(self, z, x_real):
         x_fake = self.generator(Variable(z))
@@ -145,17 +126,11 @@ class GenerativeAdversarialUpdater(training.StandardUpdater):
 
         return loss
 
-    def update_core(self):
-        # Update all networks once each, you may update any network more than
-        # once to balance the training in this iteration
-        z = self.converter(self._iterators['z'].next(), self.device)
-        x_real = self.converter(self._iterators['main'].next(), self.device)
+    def sample(self):
+        """Return a sample from the generator with random noise."""
+        z_it = self._iterators['z'].next()
+        z = self.converter(z_it, self.device)
 
-        loss_discriminator = self.update_discriminator(z, x_real)
-        loss_generator = self.update_generator(z)
-        loss_denoiser = self.update_denoiser(x_real)
+        x_fake = self.generator(Variable(z), test=True)
 
-        if self.report:
-            reporter.report({'dis/loss': loss_discriminator})
-            reporter.report({'gen/loss': loss_generator})
-            reporter.report({'denoiser/loss': loss_denoiser})
+        return x_fake

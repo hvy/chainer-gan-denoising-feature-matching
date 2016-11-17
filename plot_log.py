@@ -31,7 +31,6 @@ def plot_log(filename, log):
         plt.plot(range(len(data)), data, label=key)
 
     ax = plt.gca()
-    # ax.set_ylim([0, 2])
     ax.legend(loc='best')
     plt.savefig(filename)
     plt.clf()
