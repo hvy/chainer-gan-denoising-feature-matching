@@ -30,23 +30,26 @@ Denoising autoencoder reconstruction error (L2, mean squared error).
 
 ### Samples
 
-**Epoch 1**
+**Epoch 100**
 
-<img src="./samples/1.png" width="512px;"/>
+<img src="./samples/100.png" width="512px;"/>
 
-**Epoch 10**
+**Epoch 80**
 
-<img src="./samples/10.png" width="512px;"/>
+<img src="./samples/80.png" width="512px;"/>
 
-**Epoch 20**
+**Epoch 60**
 
-<img src="./samples/20.png" width="512px;"/>
-
-**Epoch 30**
-
-<img src="./samples/30.png" width="512px;"/>
+<img src="./samples/60.png" width="512px;"/>
 
 **Epoch 40**
 
 <img src="./samples/40.png" width="512px;"/>
 
+**Epoch 20**
+
+<img src="./samples/20.png" width="512px;"/>
+
+**Epoch 1**
+
+<img src="./samples/1.png" width="512px;"/>
