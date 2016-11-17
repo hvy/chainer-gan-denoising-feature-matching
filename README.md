@@ -16,17 +16,11 @@ The network is trained on 32x32 RGB images (3 channels) from CIFAR-10.
 
 <img src="./samples/log.png" width="512px;"/>
 
-#### Discriminator Loss
+- **Discriminator Loss** Traditional discriminator GAN loss.
 
-Traditional discriminator GAN loss.
+- **Generator Loss** Traditional generator GAN loss and reconstruction error (L2, mean squared error).
 
-#### Generator Loss
-
-Traditional generator GAN loss and reconstruction error (L2, mean squared error).
-
-#### Denoiser Loss
-
-Denoising autoencoder reconstruction error (L2, mean squared error).
+- **Denoiser Loss** Denoising autoencoder reconstruction error (L2, mean squared error).
 
 ### Samples
 
