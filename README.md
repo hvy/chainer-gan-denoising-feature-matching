@@ -4,7 +4,7 @@ An unofficial attempt to implement the GAN proposed in [Improving Generative Adv
 
 Details such as activations and hyperparameters not presented in the paper are simply guessed.
 
-The denoising autoencoder in the original papers is trained to reconstructs corrupted images with Gaussian noise. **In this implementation the autoencoder is trained to remove the noise instead**. *Edit: According to the author, this is simply a typo in the paper and the autoencoder should be trained to remove the noise as in this implementation.*
+~~The denoising autoencoder in the original papers is trained to reconstructs corrupted images with Gaussian noise. **In this implementation the autoencoder is trained to remove the noise instead**.~~ *Edit: According to the author, this is simply a typo in the paper and the autoencoder should be trained to remove the noise as in this implementation.*
 
 This implementation does not separately keep track of the batch normalization statistics for the discrimnator (including the feature extractor) and the denoising autoencoder for real and generated data.
 
