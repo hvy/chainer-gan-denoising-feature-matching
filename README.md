@@ -46,7 +46,7 @@ Denoising autoencoder reconstruction error (L2, mean squared error).
 
 <img src="./samples/30.png" width="512px;"/>
 
-**Epoch 30**
+**Epoch 40**
 
 <img src="./samples/40.png" width="512px;"/>
 
