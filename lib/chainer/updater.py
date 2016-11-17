@@ -113,10 +113,6 @@ class GenerativeAdversarialUpdater(training.StandardUpdater):
         noise = F.gaussian(mean, ln_var)
         corrupted_features = features + noise
 
-        # NOTE: In the original paper, the authors train a denoising autoencoder
-        # that learns to reconstructor the corruption, this implementation
-        # is different in the sense that the autoencoder actually learns to
-        # remove the noiser
         denoised = self.denoiser(corrupted_features)
 
         loss = F.mean_squared_error(features, denoised)

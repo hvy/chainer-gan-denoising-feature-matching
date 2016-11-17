@@ -18,8 +18,8 @@ def parse_args():
     parser.add_argument('--nz', type=int, default=100)
     parser.add_argument('--epochs', type=int, default=100)
     parser.add_argument('--batch-size', type=int, default=128)
-    parser.add_argument('--lambda-denoise', type=float, default=0.5)
-    parser.add_argument('--lambda-adv', type=float, default=0.5)
+    parser.add_argument('--lambda-denoise', type=float, default=1.0)
+    parser.add_argument('--lambda-adv', type=float, default=0.03)
     return parser.parse_args()
 
 
@@ -36,9 +36,9 @@ if __name__ == '__main__':
     train_iter = iterators.SerialIterator(train, batch_size)
     z_iter = iterators.RandomNoiseIterator(UniformNoiseGenerator(-1, 1, nz), batch_size)
 
-    optimizer_generator = optimizers.Adam(alpha=1e-3, beta1=0.5)
-    optimizer_discriminator = optimizers.Adam(alpha=1e-3, beta1=0.5)
-    optimizer_denoiser = optimizers.Adam(alpha=1e-3, beta1=0.5)
+    optimizer_generator = optimizers.Adam(alpha=1e-4, beta1=0.5)
+    optimizer_discriminator = optimizers.Adam(alpha=1e-4, beta1=0.5)
+    optimizer_denoiser = optimizers.Adam(alpha=1e-4, beta1=0.5)
 
     optimizer_generator.setup(Generator())
     optimizer_discriminator.setup(Discriminator())

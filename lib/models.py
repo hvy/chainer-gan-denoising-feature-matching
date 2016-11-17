@@ -51,7 +51,7 @@ class FeatureExtractor(Chain):
             c2=L.Convolution2D(32, 64, 4, stride=2, pad=1),
             c3=L.Convolution2D(64, 128, 4, stride=2, pad=1),
             c4=L.Convolution2D(128, 256, 4, stride=2, pad=1),
-            fc=L.Linear(None, 512),
+            fc=L.Linear(None, 1024),
             bn_c2=L.BatchNormalization(64),
             bn_c3=L.BatchNormalization(128),
             bn_c4=L.BatchNormalization(256))
@@ -77,19 +77,34 @@ class Classifier(Chain):
 class Denoiser(Chain):
     def __init__(self):
         super().__init__(
-            l1=L.Linear(512, 512),
-            l2=L.Linear(512, 512),
-            l3=L.Linear(512, 512),
-            l4=L.Linear(512, 512),
-            l5=L.Linear(512, 512),
-            bn_l2=L.BatchNormalization(512),
-            bn_l3=L.BatchNormalization(512),
-            bn_l4=L.BatchNormalization(512))
+            fc1=L.Linear(1024, 1024),
+            fc2=L.Linear(1024, 1024),
+            fc3=L.Linear(1024, 1024),
+            fc4=L.Linear(1024, 1024),
+            fc5=L.Linear(1024, 1024),
+            fc6=L.Linear(1024, 1024),
+            fc7=L.Linear(1024, 1024),
+            fc8=L.Linear(1024, 1024),
+            fc9=L.Linear(1024, 1024),
+            fc10=L.Linear(1024, 1024),
+            bn_fc2=L.BatchNormalization(1024),
+            bn_fc3=L.BatchNormalization(1024),
+            bn_fc4=L.BatchNormalization(1024),
+            bn_fc5=L.BatchNormalization(1024),
+            bn_fc6=L.BatchNormalization(1024),
+            bn_fc7=L.BatchNormalization(1024),
+            bn_fc8=L.BatchNormalization(1024),
+            bn_fc9=L.BatchNormalization(1024))
 
     def __call__(self, x, test=False):
-        h = F.relu(self.l1(x))
-        h = F.relu(self.bn_l2(self.l2(h), test=test))
-        h = F.relu(self.bn_l3(self.l3(h), test=test))
-        h = F.relu(self.bn_l4(self.l4(h), test=test))
-        h = self.l5(h)
+        h = F.relu(self.fc1(x))
+        h = F.relu(self.bn_fc2(self.fc2(h), test=test))
+        h = F.relu(self.bn_fc3(self.fc3(h), test=test))
+        h = F.relu(self.bn_fc4(self.fc4(h), test=test))
+        h = F.relu(self.bn_fc5(self.fc5(h), test=test))
+        h = F.relu(self.bn_fc6(self.fc6(h), test=test))
+        h = F.relu(self.bn_fc7(self.fc7(h), test=test))
+        h = F.relu(self.bn_fc8(self.fc8(h), test=test))
+        h = F.relu(self.bn_fc9(self.fc9(h), test=test))
+        h = self.fc10(h)
         return h
