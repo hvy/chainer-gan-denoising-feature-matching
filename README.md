@@ -10,7 +10,7 @@ The corruption function used when updating the parameters of the autoencoder is 
 
 ### Loss
 
-The network is trained on 32x32 RGB images (3 channels) from CIFAR-10.
+The network is trained on CIFAR-10 (32x32 rgb images) for 100 epochs with a batch size of 128.
 
 <img src="./samples/log.png" width="512px;"/>
 
