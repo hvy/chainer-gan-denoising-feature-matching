@@ -4,7 +4,7 @@ from chainer import links as L
 
 
 class Generator(Chain):
-    """Generates 32x32 images using four doubling upsamplings on 2x2 images."""
+    """Generates 32x32 images using 4 upsamplings starting from 2x2 feature maps."""
     def __init__(self):
         super(Generator, self).__init__(
             fc=L.Linear(None, 1024),
@@ -43,8 +43,8 @@ class Discriminator(Chain):
 
 
 class FeatureExtractor(Chain):
-    """Feature extractor, phi, that takes an 32x32 images as input and outputs
-    an one-dimensional feature vector."""
+    """Feature extractor, phi, that takes 32x32 images as inputs and outputs
+    one-dimensional feature vectors."""
     def __init__(self):
         super().__init__(
             c1=L.Convolution2D(None, 32, 4, stride=2, pad=1),
